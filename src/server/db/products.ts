@@ -1,9 +1,9 @@
 import { db } from "@/db/index";
-// import {
-//   CountryGroupDiscountTable,
-//   ProductCustomizationTable,
-//   ProductTable,
-// } from "@/drizzle/schema"
+import {
+  //   CountryGroupDiscountTable,
+  ProductCustomizationTable,
+  ProductTable,
+} from "@/db/schema";
 // import {
 //   CACHE_TAGS,
 //   dbCache,
@@ -13,7 +13,7 @@ import { db } from "@/db/index";
 //   revalidateDbCache,
 // } from "@/lib/cache"
 // import { removeTrailingSlash } from "@/lib/utils"
-// import { and, count, eq, inArray, sql } from "drizzle-orm"
+import { and, count, eq, inArray, sql } from "drizzle-orm";
 // import { BatchItem } from "drizzle-orm/batch"
 
 // export function getProductCountryGroups({
@@ -106,33 +106,33 @@ export function getProducts(userId: string, { limit }: { limit?: number }) {
 //   })
 // }
 
-// export async function createProduct(data: typeof ProductTable.$inferInsert) {
-//   const [newProduct] = await db
-//     .insert(ProductTable)
-//     .values(data)
-//     .returning({ id: ProductTable.id, userId: ProductTable.clerkUserId })
+export async function createProduct(data: typeof ProductTable.$inferInsert) {
+  const [newProduct] = await db.insert(ProductTable).values(data).returning({
+    id: ProductTable.id,
+    // , userId: ProductTable.clerkUserId
+  });
 
-//   try {
-//     await db
-//       .insert(ProductCustomizationTable)
-//       .values({
-//         productId: newProduct.id,
-//       })
-//       .onConflictDoNothing({
-//         target: ProductCustomizationTable.productId,
-//       })
-//   } catch (e) {
-//     await db.delete(ProductTable).where(eq(ProductTable.id, newProduct.id))
-//   }
+  try {
+    await db
+      .insert(ProductCustomizationTable)
+      .values({
+        productId: newProduct.id,
+      })
+      .onConflictDoNothing({
+        target: ProductCustomizationTable.productId,
+      });
+  } catch (e) {
+    await db.delete(ProductTable).where(eq(ProductTable.id, newProduct.id));
+  }
 
-//   revalidateDbCache({
-//     tag: CACHE_TAGS.products,
-//     userId: newProduct.userId,
-//     id: newProduct.id,
-//   })
+  //   revalidateDbCache({
+  //     tag: CACHE_TAGS.products,
+  //     userId: newProduct.userId,
+  //     id: newProduct.id,
+  //   })
 
-//   return newProduct
-// }
+  return newProduct;
+}
 
 // export async function updateProduct(
 //   data: Partial<typeof ProductTable.$inferInsert>,

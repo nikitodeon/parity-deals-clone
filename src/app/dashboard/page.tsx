@@ -1,10 +1,10 @@
 import { getProducts } from "@/server/db/products";
 import { auth } from "@clerk/nextjs/server";
 import { NoProducts } from "./_components/NoProducts";
-// import Link from "next/link"
-// import { ArrowRightIcon, PlusIcon } from "lucide-react"
-// import { Button } from "@/components/ui/button"
-// import { ProductGrid } from "./_components/ProductGrid"
+import Link from "next/link";
+import { ArrowRightIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProductGrid } from "./_components/ProductGrid";
 // import { HasPermission } from "@/components/HasPermission"
 // import { canAccessAnalytics } from "@/server/permissions"
 // import {
@@ -22,8 +22,7 @@ export default async function DashboardPage() {
 
   if (products.length === 0) return <NoProducts />;
 
-  return null;
-  /*
+  return (
     <>
       <h2 className="mb-6 text-3xl font-semibold flex justify-between">
         <Link
@@ -50,27 +49,28 @@ export default async function DashboardPage() {
           <ArrowRightIcon className="group-hover:translate-x-1 transition-transform" />
         </Link>
       </h2>
-      <HasPermission permission={canAccessAnalytics} renderFallback>
+      {/* <HasPermission permission={canAccessAnalytics} renderFallback>
         <AnalyticsChart userId={userId} />
-      </HasPermission>
+      </HasPermission> */}
     </>
-  )
+  );
 }
 
-async function AnalyticsChart({ userId }: { userId: string }) {
-  const chartData = await getViewsByDayChartData({
-    userId,
-    interval: CHART_INTERVALS.last30Days,
-    timezone: "UTC",
-  })
+// async function AnalyticsChart({ userId }: { userId: string }) {
+//   const chartData = await getViewsByDayChartData({
+//     userId,
+//     interval: CHART_INTERVALS.last30Days,
+//     timezone: "UTC",
+//   })
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Views by Day</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ViewsByDayChart chartData={chartData} />
-      </CardContent>
-    </Card>*/
-}
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Views by Day</CardTitle>
+//       </CardHeader>
+//       <CardContent>
+//         <ViewsByDayChart chartData={chartData} />
+//       </CardContent>
+//     </Card>
+//   )
+// }
