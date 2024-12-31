@@ -4,14 +4,14 @@ import {
   ProductCustomizationTable,
   ProductTable,
 } from "@/db/schema";
-// import {
-//   CACHE_TAGS,
-//   dbCache,
-//   getGlobalTag,
-//   getIdTag,
-//   getUserTag,
-//   revalidateDbCache,
-// } from "@/lib/cache"
+import {
+  CACHE_TAGS,
+  dbCache,
+  getGlobalTag,
+  getIdTag,
+  getUserTag,
+  revalidateDbCache,
+} from "@/lib/cache";
 // import { removeTrailingSlash } from "@/lib/utils"
 import { and, count, eq, inArray, sql } from "drizzle-orm";
 // import { BatchItem } from "drizzle-orm/batch"
@@ -48,23 +48,16 @@ import { and, count, eq, inArray, sql } from "drizzle-orm";
 //   return cacheFn({ productId, userId })
 // }
 
-export function getProducts(userId: string, { limit }: { limit?: number }) {
-  return db.query.ProductTable.findMany({
-    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
-    orderBy: ({ createdAt }, { desc }) => desc(createdAt),
-    limit,
+export function getProducts(
+  userId: string,
+  { limit }: { limit?: number } = {}
+) {
+  const cacheFn = dbCache(getProductsInternal, {
+    tags: [getUserTag(userId, CACHE_TAGS.products)],
   });
+
+  return cacheFn(userId, { limit });
 }
-
-//   userId: string,
-//   { limit }: { limit?: number } = {}
-// ) {
-//   const cacheFn = dbCache(getProductsInternal, {
-//     tags: [getUserTag(userId, CACHE_TAGS.products)],
-//   })
-
-//   return cacheFn(userId, { limit })
-// }
 
 // export function getProduct({ id, userId }: { id: string; userId: string }) {
 //   const cacheFn = dbCache(getProductInternal, {
@@ -109,7 +102,7 @@ export function getProducts(userId: string, { limit }: { limit?: number }) {
 export async function createProduct(data: typeof ProductTable.$inferInsert) {
   const [newProduct] = await db.insert(ProductTable).values(data).returning({
     id: ProductTable.id,
-    // , userId: ProductTable.clerkUserId
+    userId: ProductTable.clerkUserId,
   });
 
   try {
@@ -125,11 +118,11 @@ export async function createProduct(data: typeof ProductTable.$inferInsert) {
     await db.delete(ProductTable).where(eq(ProductTable.id, newProduct.id));
   }
 
-  //   revalidateDbCache({
-  //     tag: CACHE_TAGS.products,
-  //     userId: newProduct.userId,
-  //     id: newProduct.id,
-  //   })
+  revalidateDbCache({
+    tag: CACHE_TAGS.products,
+    userId: newProduct.userId,
+    id: newProduct.id,
+  });
 
   return newProduct;
 }
@@ -154,27 +147,29 @@ export async function createProduct(data: typeof ProductTable.$inferInsert) {
 //   return rowCount > 0
 // }
 
-// export async function deleteProduct({
-//   id,
-//   userId,
-// }: {
-//   id: string
-//   userId: string
-// }) {
-//   const { rowCount } = await db
-//     .delete(ProductTable)
-//     .where(and(eq(ProductTable.id, id), eq(ProductTable.clerkUserId, userId)))
+export async function deleteProduct({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) {
+  const result = await db
+    .delete(ProductTable)
+    .where(and(eq(ProductTable.id, id), eq(ProductTable.clerkUserId, userId)));
 
-//   if (rowCount > 0) {
-//     revalidateDbCache({
-//       tag: CACHE_TAGS.products,
-//       userId,
-//       id,
-//     })
-//   }
+  const rowCount = result?.rowCount ?? 0;
 
-//   return rowCount > 0
-// }
+  if (rowCount > 0) {
+    revalidateDbCache({
+      tag: CACHE_TAGS.products,
+      userId,
+      id,
+    });
+  }
+
+  return rowCount > 0;
+}
 
 // export async function updateCountryDiscounts(
 //   deleteGroup: { countryGroupId: string }[],
@@ -309,13 +304,13 @@ export async function createProduct(data: typeof ProductTable.$inferInsert) {
 //   return data?.productCustomization
 // }
 
-// function getProductsInternal(userId: string, { limit }: { limit?: number }) {
-//   return db.query.ProductTable.findMany({
-//     where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
-//     orderBy: ({ createdAt }, { desc }) => desc(createdAt),
-//     limit,
-//   })
-// }
+function getProductsInternal(userId: string, { limit }: { limit?: number }) {
+  return db.query.ProductTable.findMany({
+    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+    orderBy: ({ createdAt }, { desc }) => desc(createdAt),
+    limit,
+  });
+}
 
 // function getProductInternal({ id, userId }: { id: string; userId: string }) {
 //   return db.query.ProductTable.findFirst({

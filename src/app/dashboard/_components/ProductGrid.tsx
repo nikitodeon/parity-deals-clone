@@ -18,7 +18,7 @@ import {
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AddToSiteProductModalContent } from "./AddToSiteProductModalContent";
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-// import { DeleteProductAlertDialogContent } from "./DeleteProductAlertDialogContent"
+import { DeleteProductAlertDialogContent } from "./DeleteProductAlertDialogContent";
 
 export function ProductGrid({
   products,
@@ -79,7 +79,7 @@ export function ProductCard({
                   </AlertDialogTrigger>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* <DeleteProductAlertDialogContent id={id} /> */}
+              <DeleteProductAlertDialogContent id={id} />
             </AlertDialog>
             <AddToSiteProductModalContent id={id} />
           </Dialog>

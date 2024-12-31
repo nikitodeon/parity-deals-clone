@@ -9,7 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import {
   createProduct as createProductDb,
-  //   deleteProduct as deleteProductDb,
+  deleteProduct as deleteProductDb,
   //   updateProduct as updateProductDb,
   //   updateCountryDiscounts as updateCountryDiscountsDb,
   //   updateProductCustomization as updateProductCustomizationDb,
@@ -53,21 +53,21 @@ export async function createProduct(
 //   }
 // }
 
-// export async function deleteProduct(id: string) {
-//   const { userId } = auth()
-//   const errorMessage = "There was an error deleting your product"
+export async function deleteProduct(id: string) {
+  const { userId } = await auth();
+  const errorMessage = "There was an error deleting your product";
 
-//   if (userId == null) {
-//     return { error: true, message: errorMessage }
-//   }
+  if (userId == null) {
+    return { error: true, message: errorMessage };
+  }
 
-//   const isSuccess = await deleteProductDb({ id, userId })
+  const isSuccess = await deleteProductDb({ id, userId });
 
-//   return {
-//     error: !isSuccess,
-//     message: isSuccess ? "Successfully deleted your product" : errorMessage,
-//   }
-// }
+  return {
+    error: !isSuccess,
+    message: isSuccess ? "Successfully deleted your product" : errorMessage,
+  };
+}
 
 // export async function updateCountryDiscounts(
 //   id: string,
