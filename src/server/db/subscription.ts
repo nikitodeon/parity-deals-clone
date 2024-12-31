@@ -1,35 +1,37 @@
 // import { subscriptionTiers } from "@/data/subscriptionTiers";
 import { db } from "@/db/index";
 import { UserSubscriptionTable } from "@/db/schema";
-// import { CACHE_TAGS, dbCache, getUserTag, revalidateDbCache } from "@/lib/cache"
+import {
+  CACHE_TAGS,
+  dbCache,
+  getUserTag,
+  revalidateDbCache,
+} from "@/lib/cache";
 // import { SQL } from "drizzle-orm";
 
 export async function createUserSubscription(
   data: typeof UserSubscriptionTable.$inferInsert
 ) {
-  return db.insert(UserSubscriptionTable).values(data).onConflictDoNothing({
-    target: UserSubscriptionTable.clerkUserId,
-  });
-  //   const [newSubscription] = await db
-  //     .insert(UserSubscriptionTable)
-  //     .values(data)
-  //     .onConflictDoNothing({
-  //       target: UserSubscriptionTable.clerkUserId,
-  //     })
-  //     .returning({
-  //       id: UserSubscriptionTable.id,
-  //       userId: UserSubscriptionTable.clerkUserId,
-  //     })
+  const [newSubscription] = await db
+    .insert(UserSubscriptionTable)
+    .values(data)
+    .onConflictDoNothing({
+      target: UserSubscriptionTable.clerkUserId,
+    })
+    .returning({
+      id: UserSubscriptionTable.id,
+      userId: UserSubscriptionTable.clerkUserId,
+    });
 
-  //   if (newSubscription != null) {
-  //     revalidateDbCache({
-  //       tag: CACHE_TAGS.subscription,
-  //       id: newSubscription.id,
-  //       userId: newSubscription.userId,
-  //     })
-  //   }
+  if (newSubscription != null) {
+    revalidateDbCache({
+      tag: CACHE_TAGS.subscription,
+      id: newSubscription.id,
+      userId: newSubscription.userId,
+    });
+  }
 
-  //   return newSubscription
+  return newSubscription;
 }
 
 // export function getUserSubscription(userId: string) {

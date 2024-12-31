@@ -18,44 +18,36 @@ import { Button } from "@/components/ui/button";
 
 import { productDetailsSchema } from "@/schemas/products";
 
-import {
-  createProduct,
-  // updateProduct
-} from "@/server/actions/products";
+import { createProduct, updateProduct } from "@/server/actions/products";
 import { useToast } from "@/hooks/use-toast";
 // import { RequiredLabelIcon } from "@/components/RequiredLabelIcon"
 
-export function ProductDetailsForm(
-  {
-    //   product,
-    // }: {
-    //   product?: {
-    //     id: string
-    //     name: string
-    //     description: string | null
-    //     url: string
-    //   }
-  }
-) {
+export function ProductDetailsForm({
+  product,
+}: {
+  product?: {
+    id: string;
+    name: string;
+    description: string | null;
+    url: string;
+  };
+}) {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof productDetailsSchema>>({
     resolver: zodResolver(productDetailsSchema),
-    defaultValues:
-      // :
-      //  product
-      //   ? { ...product, description: product.description ?? "" }
-      {
-        name: "",
-        url: "",
-        description: "",
-      },
+    defaultValues: product
+      ? { ...product, description: product?.description ?? "" }
+      : {
+          name: "",
+          url: "",
+          description: "",
+        },
   });
 
   async function onSubmit(values: z.infer<typeof productDetailsSchema>) {
-    const data = await createProduct(values);
-    // const action =
-    //   product == null ? createProduct : updateProduct.bind(null, product.id)
-    // const data = await action(values)
+    const action =
+      product == null ? createProduct : updateProduct.bind(null, product.id);
+    const data = await action(values);
 
     if (data?.message) {
       toast({
