@@ -15,11 +15,11 @@ import {
 } from "@/data/subscriptionTiers";
 import { formatCompactNumber } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-// import {
-//   createCancelSession,
-//   createCheckoutSession,
-//   createCustomerPortalSession,
-// } from "@/server/actions/stripe"
+import {
+  createCancelSession,
+  createCheckoutSession,
+  createCustomerPortalSession,
+} from "@/server/actions/stripe";
 import { getProductCount } from "@/server/db/products";
 import { getProductViewCount } from "@/server/db/productViews";
 import { getUserSubscriptionTier } from "@/server/db/subscription";

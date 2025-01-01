@@ -1,7 +1,7 @@
-// import { env } from "./env/server"
+import { env } from "./env/server";
 
 export type TierNames = keyof typeof subscriptionTiers;
-// export type PaidTierNames = Exclude<TierNames, "Free">
+export type PaidTierNames = Exclude<TierNames, "Free">;
 
 export const subscriptionTiers = {
   Free: {
@@ -22,7 +22,7 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: false,
     canRemoveBranding: true,
-    // stripePriceId: env.STRIPE_BASIC_PLAN_STRIPE_PRICE_ID,
+    stripePriceId: env.STRIPE_BASIC_PLAN_STRIPE_PRICE_ID,
   },
   Standard: {
     name: "Standard",
@@ -32,7 +32,7 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: true,
     canRemoveBranding: true,
-    // stripePriceId: env.STRIPE_STANDARD_PLAN_STRIPE_PRICE_ID,
+    stripePriceId: env.STRIPE_STANDARD_PLAN_STRIPE_PRICE_ID,
   },
   Premium: {
     name: "Premium",
@@ -42,7 +42,7 @@ export const subscriptionTiers = {
     canAccessAnalytics: true,
     canCustomizeBanner: true,
     canRemoveBranding: true,
-    // stripePriceId: env.STRIPE_PREMIUM_PLAN_STRIPE_PRICE_ID,
+    stripePriceId: env.STRIPE_PREMIUM_PLAN_STRIPE_PRICE_ID,
   },
 } as const;
 
