@@ -1,4 +1,4 @@
-// import { subscriptionTiers } from "@/data/subscriptionTiers";
+import { subscriptionTiers } from "@/data/subscriptionTiers";
 import { db } from "@/db/index";
 import { UserSubscriptionTable } from "@/db/schema";
 import {
@@ -7,7 +7,7 @@ import {
   getUserTag,
   revalidateDbCache,
 } from "@/lib/cache";
-// import { SQL } from "drizzle-orm";
+import { SQL } from "drizzle-orm";
 
 export async function createUserSubscription(
   data: typeof UserSubscriptionTable.$inferInsert
@@ -34,46 +34,70 @@ export async function createUserSubscription(
   return newSubscription;
 }
 
+export function getUserSubscription(userId: string) {
+  ////////
+  const cacheFn = dbCache(getUserSubscriptionInternal, {
+    tags: [getUserTag(userId, CACHE_TAGS.subscription)],
+  });
+
+  return cacheFn(userId);
+  ////////////
+  // return getUserSubscriptionInternal(userId);
+}
+////////////////
 // export function getUserSubscription(userId: string) {
 //   const cacheFn = dbCache(getUserSubscriptionInternal, {
 //     tags: [getUserTag(userId, CACHE_TAGS.subscription)],
-//   })
+//   });
 
-//   return cacheFn(userId)
+//   const subscription = cacheFn(userId);
+//   console.log("Cache Subscription Data:", subscription); // Лог данных из кэша
+//   return subscription;
 // }
 
-// export async function updateUserSubscription(
-//   where: SQL,
-//   data: Partial<typeof UserSubscriptionTable.$inferInsert>
-// ) {
-//   const [updatedSubscription] = await db
-//     .update(UserSubscriptionTable)
-//     .set(data)
-//     .where(where)
-//     .returning({
-//       id: UserSubscriptionTable.id,
-//       userId: UserSubscriptionTable.clerkUserId,
-//     })
+export async function updateUserSubscription(
+  where: SQL,
+  data: Partial<typeof UserSubscriptionTable.$inferInsert>
+) {
+  const [updatedSubscription] = await db
+    .update(UserSubscriptionTable)
+    .set(data)
+    .where(where)
+    .returning({
+      id: UserSubscriptionTable.id,
+      userId: UserSubscriptionTable.clerkUserId,
+    });
 
-//   if (updatedSubscription != null) {
-//     revalidateDbCache({
-//       tag: CACHE_TAGS.subscription,
-//       userId: updatedSubscription.userId,
-//       id: updatedSubscription.id,
-//     })
-//   }
-// }
+  if (updatedSubscription != null) {
+    revalidateDbCache({
+      tag: CACHE_TAGS.subscription,
+      userId: updatedSubscription.userId,
+      id: updatedSubscription.id,
+    });
+  }
+}
 
-// export async function getUserSubscriptionTier(userId: string) {
-//   const subscription = await getUserSubscription(userId)
+export async function getUserSubscriptionTier(userId: string) {
+  const subscription = await getUserSubscription(userId);
 
-//   if (subscription == null) throw new Error("User has no subscription")
+  if (subscription == null)
+    //  return subscriptionTiers["Free"];
+    throw new Error("User has no subscription");
 
-//   return subscriptionTiers[subscription.tier]
-// }
+  return subscriptionTiers[subscription.tier];
+}
 
+function getUserSubscriptionInternal(userId: string) {
+  return db.query.UserSubscriptionTable.findFirst({
+    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+  });
+}
+///////////
 // function getUserSubscriptionInternal(userId: string) {
-//   return db.query.UserSubscriptionTable.findFirst({
+//   const result = db.query.UserSubscriptionTable.findFirst({
 //     where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
-//   })
+//   });
+
+//   console.log("DB Query Result:", result); // Лог результата из базы
+//   return result;
 // }
