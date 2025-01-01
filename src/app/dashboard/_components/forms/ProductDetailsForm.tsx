@@ -20,7 +20,7 @@ import { productDetailsSchema } from "@/schemas/products";
 
 import { createProduct, updateProduct } from "@/server/actions/products";
 import { useToast } from "@/hooks/use-toast";
-// import { RequiredLabelIcon } from "@/components/RequiredLabelIcon"
+import { RequiredLabelIcon } from "@/components/RequiredLabelIcon";
 
 export function ProductDetailsForm({
   product,
@@ -72,7 +72,7 @@ export function ProductDetailsForm({
               <FormItem>
                 <FormLabel>
                   Product Name
-                  {/* <RequiredLabelIcon /> */}
+                  <RequiredLabelIcon />
                 </FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -88,7 +88,7 @@ export function ProductDetailsForm({
               <FormItem>
                 <FormLabel>
                   Enter your website URL
-                  {/* <RequiredLabelIcon /> */}
+                  <RequiredLabelIcon />
                 </FormLabel>
                 <FormControl>
                   <Input {...field} />

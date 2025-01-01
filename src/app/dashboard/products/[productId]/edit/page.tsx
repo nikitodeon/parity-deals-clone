@@ -1,5 +1,5 @@
 import { CountryDiscountsForm } from "@/app/dashboard/_components/forms/CountryDiscountsForm";
-// import { ProductCustomizationForm } from "@/app/dashboard/_components/forms/ProductCustomizationForm"
+import { ProductCustomizationForm } from "@/app/dashboard/_components/forms/ProductCustomizationForm";
 import { ProductDetailsForm } from "@/app/dashboard/_components/forms/ProductDetailsForm";
 import { PageWithBackButton } from "@/app/dashboard/_components/PageWithBackButton";
 import {
@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// import { clearFullCache } from "@/lib/cache"
+// import { clearFullCache } from "@/lib/cache";
 import {
   getProduct,
   getProductCountryGroups,
-  //   getProductCustomization,
+  getProductCustomization,
 } from "@/server/db/products";
-// import { canCustomizeBanner, canRemoveBranding } from "@/server/permissions"
+import { canCustomizeBanner, canRemoveBranding } from "@/server/permissions";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
@@ -29,7 +29,7 @@ export default async function EditProductPage({
   searchParams: { tab?: string };
 }) {
   const { productId } = await Promise.resolve(params);
-  const { tab = "details" } = searchParams;
+  const { tab = "details" } = await Promise.resolve(searchParams);
 
   const { userId, redirectToSignIn } = await auth();
   if (userId == null) return redirectToSignIn();
@@ -95,7 +95,7 @@ async function CountryTab({
     productId,
     userId,
   });
-  //clearFullCache();
+  //   clearFullCache();
   return (
     <Card>
       <CardHeader>
@@ -122,9 +122,9 @@ async function CustomizationsTab({
   productId: string;
   userId: string;
 }) {
-  //   const customization = await getProductCustomization({ productId, userId })
+  const customization = await getProductCustomization({ productId, userId });
 
-  //   if (customization == null) return notFound()
+  if (customization == null) return notFound();
 
   return (
     <Card>
@@ -132,11 +132,11 @@ async function CustomizationsTab({
         <CardTitle className="text-xl">Banner Customization</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* <ProductCustomizationForm
+        <ProductCustomizationForm
           canRemoveBranding={await canRemoveBranding(userId)}
           canCustomizeBanner={await canCustomizeBanner(userId)}
           customization={customization}
-        /> */}
+        />
       </CardContent>
     </Card>
   );
