@@ -1,4 +1,4 @@
-// import { subscriptionTiers } from "@/data/subscriptionTiers";
+import { subscriptionTiers } from "@/data/subscriptionTiers";
 import { db } from "@/db/index";
 import { UserSubscriptionTable } from "@/db/schema";
 import {
@@ -34,13 +34,13 @@ export async function createUserSubscription(
   return newSubscription;
 }
 
-// export function getUserSubscription(userId: string) {
-//   const cacheFn = dbCache(getUserSubscriptionInternal, {
-//     tags: [getUserTag(userId, CACHE_TAGS.subscription)],
-//   })
+export function getUserSubscription(userId: string) {
+  const cacheFn = dbCache(getUserSubscriptionInternal, {
+    tags: [getUserTag(userId, CACHE_TAGS.subscription)],
+  });
 
-//   return cacheFn(userId)
-// }
+  return cacheFn(userId);
+}
 
 // export async function updateUserSubscription(
 //   where: SQL,
@@ -64,16 +64,16 @@ export async function createUserSubscription(
 //   }
 // }
 
-// export async function getUserSubscriptionTier(userId: string) {
-//   const subscription = await getUserSubscription(userId)
+export async function getUserSubscriptionTier(userId: string) {
+  const subscription = await getUserSubscription(userId);
 
-//   if (subscription == null) throw new Error("User has no subscription")
+  if (subscription == null) throw new Error("User has no subscription");
 
-//   return subscriptionTiers[subscription.tier]
-// }
+  return subscriptionTiers[subscription.tier];
+}
 
-// function getUserSubscriptionInternal(userId: string) {
-//   return db.query.UserSubscriptionTable.findFirst({
-//     where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
-//   })
-// }
+function getUserSubscriptionInternal(userId: string) {
+  return db.query.UserSubscriptionTable.findFirst({
+    where: ({ clerkUserId }, { eq }) => eq(clerkUserId, userId),
+  });
+}

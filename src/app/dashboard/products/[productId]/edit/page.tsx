@@ -15,9 +15,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   getProduct,
   getProductCountryGroups,
-  //   getProductCustomization,
+  getProductCustomization,
 } from "@/server/db/products";
-// import { canCustomizeBanner, canRemoveBranding } from "@/server/permissions"
+import {
+  //  canCustomizeBanner,
+  canRemoveBranding,
+} from "@/server/permissions";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
@@ -29,7 +32,7 @@ export default async function EditProductPage({
   searchParams: { tab?: string };
 }) {
   const { productId } = await Promise.resolve(params);
-  const { tab = "details" } = searchParams;
+  const { tab = "details" } = await Promise.resolve(searchParams);
 
   const { userId, redirectToSignIn } = await auth();
   if (userId == null) return redirectToSignIn();
@@ -122,9 +125,10 @@ async function CustomizationsTab({
   productId: string;
   userId: string;
 }) {
-  //   const customization = await getProductCustomization({ productId, userId })
+  const customization = await getProductCustomization({ productId, userId });
 
-  //   if (customization == null) return notFound()
+  if (customization == null) return notFound();
+  const canRemove = await canRemoveBranding(userId);
 
   return (
     <Card>
