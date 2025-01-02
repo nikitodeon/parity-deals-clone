@@ -112,28 +112,28 @@ export function getProductViewCount(userId: string, startDate: Date) {
 //   })
 // }
 
-// export async function createProductView({
-//   productId,
-//   countryId,
-//   userId,
-// }: {
-//   productId: string
-//   countryId?: string
-//   userId: string
-// }) {
-//   const [newRow] = await db
-//     .insert(ProductViewTable)
-//     .values({
-//       productId: productId,
-//       visitedAt: new Date(),
-//       countryId: countryId,
-//     })
-//     .returning({ id: ProductViewTable.id })
+export async function createProductView({
+  productId,
+  countryId,
+  userId,
+}: {
+  productId: string;
+  countryId?: string;
+  userId: string;
+}) {
+  const [newRow] = await db
+    .insert(ProductViewTable)
+    .values({
+      productId: productId,
+      visitedAt: new Date(),
+      countryId: countryId,
+    })
+    .returning({ id: ProductViewTable.id });
 
-//   if (newRow != null) {
-//     revalidateDbCache({ tag: CACHE_TAGS.productViews, userId, id: newRow.id })
-//   }
-// }
+  if (newRow != null) {
+    revalidateDbCache({ tag: CACHE_TAGS.productViews, userId, id: newRow.id });
+  }
+}
 
 async function getProductViewCountInternal(userId: string, startDate: Date) {
   const counts = await db
