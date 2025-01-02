@@ -333,6 +333,9 @@ async function getProductForBannerInternal({
   countryCode: string;
   url: string;
 }) {
+  ///////////////
+  console.log("getProductForBannerInternal input:", { id, countryCode, url });
+  //////////////
   const data = await db.query.ProductTable.findFirst({
     where: ({ id: idCol, url: urlCol }, { eq, and }) =>
       and(eq(idCol, id), eq(urlCol, removeTrailingSlash(url))),
@@ -365,7 +368,15 @@ async function getProductForBannerInternal({
       },
     },
   });
+  ////////////
+  console.log("Database query result:", data);
 
+  ///////////
+  ///////////////
+  console.log("getProductForBannerInternal input:", { id, countryCode, url });
+  console.log("Database response:", data);
+
+  /////////
   const discount = data?.countryGroupDiscounts.find(
     (discount) => discount.countryGroup.countries.length > 0
   );
@@ -378,7 +389,13 @@ async function getProductForBannerInternal({
           clerkUserId: data.clerkUserId,
           customization: data.productCustomization,
         };
-
+  //////////////
+  console.log("Processed result in getProductForBannerInternal:", {
+    product,
+    country,
+    discount,
+  });
+  //////////////
   return {
     product,
     country,

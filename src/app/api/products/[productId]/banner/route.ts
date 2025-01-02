@@ -16,30 +16,57 @@ interface CustomNextRequest extends NextRequest {
 ///////////
 export async function GET(
   request: NextRequest,
-  { params: { productId } }: { params: { productId: string } }
+  { params }: { params: { productId: string } }
 ) {
+  const { productId } = await params;
+  ////////////
+  console.log("Received productId:", productId);
+  //////////
   const headersMap = await headers();
   const requestingUrl = headersMap.get("referer") || headersMap.get("origin");
   if (requestingUrl == null) return notFound();
   const countryCode = getCountryCode(request);
+  ///////////////
+  console.log("getCountryCode result:", countryCode);
+  /////////////
   if (countryCode == null) return notFound();
-
+  //////////
+  console.log("Hi");
+  ///////////
+  ////////////////
+  console.log("params:", params);
+  console.log("productId:", productId);
+  //////////////
+  console.log("Calling getProductForBanner with params:", {
+    id: productId,
+    countryCode,
+    url: requestingUrl,
+  });
+  ////////////
+  /////////////
   const { product, discount, country } = await getProductForBanner({
     id: productId,
     countryCode,
     url: requestingUrl,
   });
-
+  //////////////////
+  console.log("getProductForBanner output:", { product, discount, country });
+  ///////////////
   if (product == null) return notFound();
 
   const canShowBanner = await canShowDiscountBanner(product.clerkUserId);
-
+  //////////////////
+  console.log("canShowDiscountBanner result:", canShowBanner);
+  ///////////////
   await createProductView({
     productId: product.id,
     countryId: country?.id,
     userId: product.clerkUserId,
   });
-
+  ////////////
+  console.log(canShowBanner);
+  console.log(country, discount);
+  //////////////
   if (!canShowBanner) return notFound();
   if (country == null || discount == null) return notFound();
 
