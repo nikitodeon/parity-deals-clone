@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { NextRequest } from "next/server";
 import { createElement } from "react";
 
-// export const runtime = "edge";
+export const runtime = "edge";
 /////////////
 interface CustomNextRequest extends NextRequest {
   geo?: { country?: string };
